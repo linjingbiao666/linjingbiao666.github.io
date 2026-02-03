@@ -1,0 +1,35 @@
+---
+const repo = import.meta.env.PUBLIC_GISCUS_REPO;
+const repoId = import.meta.env.PUBLIC_GISCUS_REPO_ID;
+const category = import.meta.env.PUBLIC_GISCUS_CATEGORY ?? 'Announcements';
+const categoryId = import.meta.env.PUBLIC_GISCUS_CATEGORY_ID;
+
+const enabled = Boolean(repo && repoId && categoryId);
+---
+
+<section class="giscus mx-auto mt-10 w-full">
+	{
+		enabled ? (
+			<script
+				src="https://giscus.app/client.js"
+				data-repo={repo}
+				data-repo-id={repoId}
+				data-category={category}
+				data-category-id={categoryId}
+				data-mapping="pathname"
+				data-strict="0"
+				data-reactions-enabled="1"
+				data-emit-metadata="0"
+				data-input-position="bottom"
+				data-theme="preferred_color_scheme"
+				data-lang="zh-CN"
+				crossorigin="anonymous"
+				async
+			/>
+		) : (
+			<div class="rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-6 text-sm text-slate-600 dark:text-slate-300">
+				评论区暂未开启（可通过 PUBLIC_GISCUS_* 环境变量配置）。
+			</div>
+		)
+	}
+</section>

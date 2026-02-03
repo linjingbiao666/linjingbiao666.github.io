@@ -1,0 +1,26 @@
+{
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "honors:sync": "node scripts/honors-sync.mjs",
+    "honors:check": "node scripts/honors-check.mjs",
+    "honors:update": "npm run honors:sync && npm run build",
+    "perf:honors:desktop": "npx -y lighthouse http://127.0.0.1:4322/honors --preset=desktop --output html --output json --output-path reports/lighthouse-honors-desktop.html --chrome-flags=\"--headless --no-sandbox\" --no-enable-error-reporting",
+    "perf:honors:provided": "npx -y lighthouse http://127.0.0.1:4322/honors --throttling-method=provided --output html --output json --output-path reports/lighthouse-honors-provided.html --chrome-flags=\"--headless --no-sandbox\" --no-enable-error-reporting"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/rss": "^4.0.15",
+    "@astrojs/sitemap": "^3.7.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "@tailwindcss/vite": "^4.1.18",
+    "astro": "^5.17.1",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^4.1.18"
+  }
+}

@@ -1,0 +1,792 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import honorsDataRaw from '../../data/honors.generated.json';
+import honorsOverridesRaw from '../../data/honors.overrides.json';
+import type { HonorItem, HonorsGeneratedData, HonorLevel } from '../../data/honors';
+import { SITE_TITLE } from '../../consts';
+
+const honorsData = honorsDataRaw as unknown as HonorsGeneratedData;
+const overrides = honorsOverridesRaw as { items: Record<string, Partial<HonorItem>> };
+
+// 1. Merge Data
+const items: HonorItem[] = honorsData.items.map(item => {
+    const override = overrides.items[item.id] || {};
+    return { ...item, ...override };
+});
+
+// 2. Stats Calculation
+const total = items.length;
+const stats = {
+    total,
+    national: items.filter(i => i.level === '国家级').length,
+    provincial: items.filter(i => i.level === '省级').length,
+    school: items.filter(i => i.level === '校级').length,
+};
+
+// Group by Year for Trend Chart
+const years = [...new Set(items.map(i => i.time.yearStart || i.time.yearEnd || 0).filter(y => y > 0))].sort();
+const trendData = years.map(year => {
+    return items.filter(i => (i.time.yearStart === year || i.time.yearEnd === year)).length;
+});
+const maxTrend = Math.max(...trendData, 1);
+
+// Group by Category for Pie Chart
+const categories = [...new Set(items.map(i => i.category))];
+const categoryData = categories.map(cat => ({
+    name: cat,
+    value: items.filter(i => i.category === cat).length
+})).sort((a, b) => b.value - a.value);
+
+// Colors
+const levelColors: Record<string, string> = {
+    '国家级': 'bg-rose-500 text-white border-rose-600',
+    '省级': 'bg-indigo-500 text-white border-indigo-600',
+    '校级': 'bg-emerald-500 text-white border-emerald-600',
+    'default': 'bg-slate-500 text-white border-slate-600'
+};
+
+const levelTextColors: Record<string, string> = {
+    '国家级': 'text-rose-600 dark:text-rose-400',
+    '省级': 'text-indigo-600 dark:text-indigo-400',
+    '校级': 'text-emerald-600 dark:text-emerald-400',
+    'default': 'text-slate-600 dark:text-slate-400'
+};
+
+// Grouping Logic
+const groupedItems: Record<string, Record<string, Record<string, HonorItem[]>>> = {};
+const sortedItems = [...items].sort((a, b) => (b.time.yearEnd || 0) - (a.time.yearEnd || 0));
+
+for (const item of sortedItems) {
+    if (!groupedItems[item.level]) {
+        groupedItems[item.level] = {};
+    }
+    if (!groupedItems[item.level][item.category]) {
+        groupedItems[item.level][item.category] = {};
+    }
+    const yearKey = item.time.display || '其他';
+    if (!groupedItems[item.level][item.category][yearKey]) {
+        groupedItems[item.level][item.category][yearKey] = [];
+    }
+    groupedItems[item.level][item.category][yearKey].push(item);
+}
+
+const levelOrder = ['国家级', '省级', '校级'];
+
+const buildSrcSet = (item: HonorItem) => {
+	const parts = [
+		item.thumbs.w320 ? `${item.thumbs.w320} 320w` : null,
+		item.thumbs.w640 ? `${item.thumbs.w640} 640w` : null,
+		item.thumbs.w960 ? `${item.thumbs.w960} 960w` : null
+	].filter(Boolean);
+	return parts.join(', ');
+};
+---
+
+<BaseLayout title={`大学荣誉 - ${SITE_TITLE}`} description="大学期间获得的校级、省级与国家级荣誉奖状汇总">
+    <!-- Header & Dashboard -->
+	<section class="mb-8 sm:mb-12">
+		<div class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-6 sm:p-8 shadow-sm relative overflow-hidden">
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+				<div class="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl bg-indigo-500/10"></div>
+				<div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full blur-3xl bg-rose-500/10"></div>
+			</div>
+            
+            <div class="relative z-10">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+                    <div>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
+                            荣誉殿堂 <span class="text-primary-600">.</span>
+                        </h1>
+                        <p class="text-slate-600 dark:text-slate-400 max-w-xl text-lg">
+                            记录大学期间的每一次突破与成长。
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        {stats.national > 0 && (
+                            <div class="flex flex-col items-center px-4 py-2 bg-rose-50 dark:bg-rose-950/30 rounded-2xl border border-rose-100 dark:border-rose-900/50">
+                                <span class="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase">国家级</span>
+                                <span class="text-2xl font-black text-rose-700 dark:text-rose-300">{stats.national}</span>
+                            </div>
+                        )}
+                        <div class="flex flex-col items-center px-4 py-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-2xl border border-indigo-100 dark:border-indigo-900/50">
+                            <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase">省级</span>
+                            <span class="text-2xl font-black text-indigo-700 dark:text-indigo-300">{stats.provincial}</span>
+                        </div>
+                        <div class="flex flex-col items-center px-4 py-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl border border-emerald-100 dark:border-emerald-900/50">
+                            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">校级</span>
+                            <span class="text-2xl font-black text-emerald-700 dark:text-emerald-300">{stats.school}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-200/60 dark:border-slate-800/60">
+                    <!-- Trend Chart -->
+                    <div>
+                        <h3 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-4">获奖趋势</h3>
+                        <div class="flex items-end gap-2 h-24">
+                            {trendData.map((count, idx) => (
+                                <div class="flex-1 flex flex-col justify-end group relative">
+                                    <div 
+                                        class="w-full bg-primary-200 dark:bg-primary-900/50 rounded-t-sm group-hover:bg-primary-500 transition-colors relative"
+                                        style={`height: ${(count / maxTrend) * 100}%`}
+                                    >
+                                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-0.5 px-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                            {count} 项
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] text-center text-slate-400 mt-1">{years[idx]}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    <!-- Category Distribution -->
+                    <div>
+                        <h3 class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-4">分类占比</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {categoryData.map((cat, idx) => (
+                                <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+                                    <span class={`w-2 h-2 rounded-full ${idx === 0 ? 'bg-primary-500' : 'bg-slate-400'}`}></span>
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">{cat.name}</span>
+                                    <span class="text-slate-400">{Math.round((cat.value / total) * 100)}%</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+	</section>
+
+    <!-- Controls & Toolbar -->
+    <div class="sticky top-4 z-30 mb-8 p-2 rounded-2xl bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border border-slate-200/70 dark:border-slate-800/70 shadow-lg shadow-slate-200/20 dark:shadow-slate-900/20">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Search -->
+            <div class="relative w-full md:w-64">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                    type="text" 
+                    id="honor-search" 
+                    placeholder="搜索荣誉标题、单位..." 
+                    class="w-full pl-9 pr-4 py-2 bg-slate-100/50 dark:bg-slate-900/50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary-500/50 transition-all"
+                >
+            </div>
+
+            <!-- Filters -->
+            <div class="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+                <div class="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1">
+                    <button class="filter-btn active px-3 py-1.5 rounded-lg text-xs font-medium transition-all" data-filter="all">全部</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white" data-filter="国家级">国家级</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white" data-filter="省级">省级</button>
+                    <button class="filter-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-500 hover:text-slate-900 dark:hover:text-white" data-filter="校级">校级</button>
+                </div>
+                
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
+                <!-- View Toggle -->
+                <div class="flex bg-slate-100 dark:bg-slate-900 rounded-xl p-1 gap-1">
+                    <button id="view-grid" class="view-btn active p-1.5 rounded-lg text-slate-600 dark:text-slate-300" aria-label="网格视图">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    </button>
+                    <button id="view-timeline" class="view-btn p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white" aria-label="时间轴视图">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+	<section id="content-area" class="min-h-[50vh]">
+        <!-- Grid View (Default) -->
+        <div id="grid-view" class="space-y-16">
+            {levelOrder.filter(level => groupedItems[level]).map(level => (
+                <div class="level-section" data-level={level}>
+                    <div class="flex items-center gap-4 mb-8">
+                         <span class={`w-2 h-8 rounded-full ${levelColors[level].split(' ')[0]}`}></span>
+                         <h2 class={`text-2xl sm:text-3xl font-extrabold tracking-tight ${levelTextColors[level]}`}>
+                            {level}荣誉
+                        </h2>
+                        <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-500 dark:text-slate-400">
+                            {Object.values(groupedItems[level]).reduce((acc, curr) => acc + curr.length, 0)}
+                        </span>
+                    </div>
+
+                    <div class="space-y-10 pl-2 sm:pl-6 border-l-2 border-slate-100 dark:border-slate-800/50 ml-1">
+                        {Object.entries(groupedItems[level]).map(([category, yearGroups]) => (
+                            <div class="category-section group">
+                                <h3 class="flex items-center gap-2 text-lg font-bold text-slate-700 dark:text-slate-200 mb-5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-primary-500 transition-colors"></span>
+                                    {category}
+                                </h3>
+                                
+                                <div class="space-y-6">
+                                    {Object.entries(yearGroups).sort((a, b) => b[0].localeCompare(a[0])).map(([year, catItems]) => (
+                                        <div class="year-group pl-4 border-l border-slate-100 dark:border-slate-800">
+                                            <h4 class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3">{year}</h4>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                                                {catItems.map((item) => (
+                                                    <div 
+                                                        class={`honor-card break-inside-avoid group/card relative rounded-2xl border bg-white dark:bg-slate-950 transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden ${levelColors[item.level] || levelColors.default} bg-opacity-0 dark:bg-opacity-0 border-opacity-20 dark:border-opacity-20`}
+                                                        data-level={item.level}
+                                                        data-category={item.category}
+                                                        data-year={item.time.yearStart}
+                                                        data-search={`${item.title} ${item.issuer}`.toLowerCase()}
+                                                    >
+                                                        <button
+                                                            type="button"
+                                                            class="w-full text-left focus:outline-none"
+                                                            onclick={`window.openHonor('${item.id}')`}
+                                                        >
+                                                            <div class="relative aspect-[1.414] overflow-hidden bg-slate-100 dark:bg-slate-900">
+                                                                <img
+                                                                    class="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
+                                                                    src={item.thumbs.w640 ?? item.original}
+                                                                    srcset={buildSrcSet(item) || undefined}
+                                                                    loading="lazy"
+                                                                    alt={item.title}
+                                                                />
+                                                                {/* Badge */}
+                                                                <div class="absolute top-3 left-3">
+                                                                    <span class={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${levelColors[item.level] || 'bg-slate-800 text-white'}`}>
+                                                                        {item.time.display}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="p-4 bg-white dark:bg-slate-950/60">
+                                                                <h3 class="font-bold text-slate-900 dark:text-white leading-snug mb-2 line-clamp-2 group-hover/card:text-primary-600 dark:group-hover/card:text-primary-400 transition-colors">
+                                                                    {item.title}
+                                                                </h3>
+                                                                <div class="flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                                                    <span class="flex items-center gap-1">
+                                                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                                                        {item.issuer}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        <!-- Timeline View (Hidden) -->
+        <div id="timeline-view" class="hidden max-w-3xl mx-auto">
+            <div class="relative border-l-2 border-slate-200 dark:border-slate-800 ml-3 md:ml-6 space-y-12 py-4">
+                {items.sort((a,b) => (b.time.yearEnd||0) - (a.time.yearEnd||0)).map((item) => (
+                    <div 
+                        class="honor-card relative pl-8 md:pl-12"
+                        data-level={item.level}
+                        data-category={item.category}
+                        data-year={item.time.yearStart}
+                        data-search={`${item.title} ${item.issuer}`.toLowerCase()}
+                    >
+                        <span class={`absolute -left-[5px] top-6 w-3 h-3 rounded-full border-2 border-white dark:border-slate-950 ${levelColors[item.level].split(' ')[0]}`}></span>
+                        <div class="flex flex-col sm:flex-row gap-4 sm:items-center bg-white/50 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 p-4 rounded-2xl hover:bg-white dark:hover:bg-slate-900 transition-colors">
+                            <div class="w-20 h-14 shrink-0 rounded-lg overflow-hidden bg-slate-100">
+                                <img src={item.thumbs.w320} class="w-full h-full object-cover" loading="lazy" />
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class={`text-[10px] font-bold px-2 py-0.5 rounded border ${levelTextColors[item.level] || levelTextColors.default} border-current bg-transparent opacity-80`}>
+                                        {item.level}
+                                    </span>
+                                    <span class="text-xs text-slate-400">{item.time.display}</span>
+                                </div>
+                                <h3 class="font-bold text-slate-900 dark:text-white cursor-pointer hover:underline" onclick={`window.openHonor('${item.id}')`}>
+                                    {item.title}
+                                </h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">{item.issuer}</p>
+                            </div>
+                            <button 
+                                onclick={`window.openHonor('${item.id}')`}
+                                class="shrink-0 p-2 text-slate-400 hover:text-primary-600 transition-colors"
+                            >
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden py-20 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400">没有找到匹配的荣誉</p>
+        </div>
+	</section>
+
+    <!-- Detailed Modal -->
+	<dialog
+		id="honor-dialog"
+		class="m-auto w-full max-w-4xl rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/95 dark:bg-slate-950/95 backdrop:backdrop-blur p-0 shadow-2xl"
+	>
+		<div class="flex flex-col md:flex-row h-full max-h-[90vh]">
+            <!-- Image Side -->
+            <div class="w-full md:w-1/2 bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4 md:p-8 relative group overflow-hidden">
+                <img id="dialog-img" class="max-w-full max-h-[50vh] md:max-h-full rounded-lg shadow-lg cursor-zoom-in transition-transform duration-300 hover:scale-[1.02]" alt="点击放大" title="点击放大查看" />
+                <a id="dialog-download" href="#" download class="absolute bottom-4 right-4 p-3 bg-white/90 text-slate-900 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10" title="下载原图">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                </a>
+            </div>
+
+            <!-- Info Side -->
+            <div class="w-full md:w-1/2 p-6 md:p-8 overflow-y-auto">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <span id="dialog-level" class="inline-block px-2 py-0.5 rounded text-xs font-bold mb-2 border"></span>
+                        <h2 id="dialog-title" class="text-2xl font-bold text-slate-900 dark:text-white"></h2>
+                    </div>
+                    <button id="dialog-close" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <svg class="w-6 h-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+                            <div class="text-xs text-slate-500 mb-1">颁发单位</div>
+                            <div id="dialog-issuer" class="font-medium text-slate-900 dark:text-white text-sm"></div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+                            <div class="text-xs text-slate-500 mb-1">获奖时间</div>
+                            <div id="dialog-time" class="font-medium text-slate-900 dark:text-white text-sm"></div>
+                        </div>
+                    </div>
+
+                    <div id="dialog-extra" class="hidden space-y-4">
+                        <div id="dialog-criteria-box" class="hidden">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                评选标准
+                            </h3>
+                            <p id="dialog-criteria" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"></p>
+                        </div>
+                        <div id="dialog-desc-box" class="hidden">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                背景详情
+                            </h3>
+                            <p id="dialog-desc" class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"></p>
+                        </div>
+                    </div>
+
+                    <!-- Ratio Visualization -->
+                    <div id="dialog-ratio-box" class="hidden p-4 rounded-xl bg-gradient-to-br from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 border border-primary-100 dark:border-primary-900/30">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-primary-700 dark:text-primary-300">获奖难度/比例</span>
+                            <span id="dialog-ratio" class="text-lg font-black text-primary-600 dark:text-primary-400"></span>
+                        </div>
+                        <div class="w-full h-2 bg-white dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-primary-500 w-1/12 animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+                         <button onclick="alert('分享功能开发中...')" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 text-white dark:bg-white dark:text-slate-900 rounded-xl font-medium hover:opacity-90 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                            分享荣誉
+                        </button>
+                    </div>
+                </div>
+            </div>
+		</div>
+	</dialog>
+
+    <!-- Zoom Dialog (replaces Overlay div to use top-layer z-index) -->
+    <dialog id="zoom-dialog" class="fixed inset-0 z-[200] w-screen h-screen max-w-none max-h-none m-0 p-0 border-none bg-transparent outline-none overflow-hidden backdrop:bg-black/95 backdrop:backdrop-blur-sm">
+        <div class="w-full h-full flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm">
+            <img id="zoom-img" class="max-w-full max-h-full object-contain scale-95 transition-transform duration-300 origin-center select-none" alt="大图预览" />
+            
+            <button id="zoom-close" class="absolute top-4 right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-50">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 rounded-full text-white/70 text-sm pointer-events-none z-50">
+                再次点击图片可进一步放大 / 点击空白处关闭
+            </div>
+        </div>
+    </dialog>
+
+	<style>
+		dialog::backdrop {
+			background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(4px);
+		}
+        /* Custom scrollbar for filter container */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+	</style>
+
+    <!-- Inject Data for JS -->
+    <script define:vars={{ items }}>
+        window.HONORS_DATA = items;
+    </script>
+
+	<script>
+        // DOM Elements
+		const dialog = document.getElementById('honor-dialog');
+		const closeBtn = document.getElementById('dialog-close');
+        const gridView = document.getElementById('grid-view');
+        const timelineView = document.getElementById('timeline-view');
+        const emptyState = document.getElementById('empty-state');
+        const searchInput = document.getElementById('honor-search');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const zoomDialog = document.getElementById('zoom-dialog'); // changed from zoomOverlay
+        const zoomImg = document.getElementById('zoom-img');
+        const zoomClose = document.getElementById('zoom-close');
+        const dialogImg = document.getElementById('dialog-img');
+
+        // State
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let isZoomed = false; // For the secondary zoom inside overlay
+
+        const activeFilterClasses = ['bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-800', 'dark:text-white'];
+        const inactiveFilterClasses = ['text-slate-500', 'hover:text-slate-900', 'dark:hover:text-white'];
+
+        const activeViewClasses = ['bg-white', 'shadow-sm', 'dark:bg-slate-800', 'dark:text-white'];
+        const inactiveViewClasses = ['text-slate-400', 'hover:text-slate-900', 'dark:hover:text-white'];
+
+        // --- Zoom Overlay Logic ---
+        function openZoom(src) {
+            if (!zoomDialog || !zoomImg) return;
+            zoomImg.src = src;
+            
+            // Use native showModal for top-layer behavior
+            if (typeof zoomDialog.showModal === 'function') {
+                zoomDialog.showModal();
+            } else {
+                // Fallback if needed, though most browsers support it
+                zoomDialog.style.display = 'flex';
+            }
+
+            // Reset scale state
+            isZoomed = false;
+            zoomImg.style.transform = 'scale(1)';
+            zoomImg.style.cursor = 'zoom-in';
+            // Slight delay for entrance animation
+            requestAnimationFrame(() => {
+                zoomImg.classList.remove('scale-95');
+                zoomImg.classList.add('scale-100');
+            });
+        }
+
+        function closeZoom() {
+            if (!zoomDialog || !zoomImg) return;
+            
+            zoomImg.classList.remove('scale-100');
+            zoomImg.classList.add('scale-95');
+            // Reset zoom state
+            setTimeout(() => {
+                isZoomed = false;
+                zoomImg.style.transform = '';
+                if (typeof zoomDialog.close === 'function') {
+                    zoomDialog.close();
+                } else {
+                    zoomDialog.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        function toggleDeepZoom(e) {
+            e.stopPropagation();
+            if (!zoomImg) return;
+            
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                // Calculate click position for transform origin if possible, 
+                // but simple 2x center scale is safer for now across devices
+                zoomImg.style.transform = 'scale(2.5)';
+                zoomImg.style.cursor = 'zoom-out';
+                // Allow panning if needed? For now just simple scale. 
+                // If we want panning, we need more complex logic. 
+                // Browser native scroll behavior with overflow-auto container is easiest for mobile.
+            } else {
+                zoomImg.style.transform = 'scale(1)';
+                zoomImg.style.cursor = 'zoom-in';
+            }
+        }
+
+        dialogImg?.addEventListener('click', (e) => {
+            if (dialogImg instanceof HTMLImageElement) {
+                openZoom(dialogImg.src);
+            }
+        });
+
+        zoomClose?.addEventListener('click', closeZoom);
+        
+        zoomDialog?.addEventListener('click', (e) => {
+            // Close if clicked on backdrop (which is the dialog element itself in this case or the wrapper div)
+            // Since we have a wrapper div inside dialog, we check if click target is the wrapper
+            // But wait, the wrapper is full screen.
+            // Let's check if the target is NOT the image or button
+            if (e.target !== zoomImg && !e.target.closest('#zoom-close') && e.target !== zoomDialog) {
+                 // If clicked on wrapper div (background)
+                 closeZoom();
+            }
+            // If native dialog backdrop is clicked, e.target is the dialog itself
+            if (e.target === zoomDialog) {
+                closeZoom();
+            }
+        });
+
+        zoomImg?.addEventListener('click', toggleDeepZoom);
+
+        // ESC to close zoom first, then dialog
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (zoomDialog && zoomDialog.open) { // Check if open property is true
+                    e.preventDefault();
+                    e.stopPropagation(); // Stop dialog from closing
+                    closeZoom();
+                }
+            }
+        }, true); // Capture phase to catch it before dialog
+
+        // Helper to set active state
+        function setActive(elements, activeEl, activeClasses, inactiveClasses) {
+            elements.forEach(el => {
+                if (el === activeEl) {
+                    el.classList.add(...activeClasses);
+                    el.classList.remove(...inactiveClasses);
+                    // Also handle specific color overrides if any (e.g. view toggle icons)
+                    if (el.classList.contains('view-btn')) {
+                        el.classList.remove('text-slate-600', 'dark:text-slate-300'); // Remove default active colors if present in HTML
+                    }
+                } else {
+                    el.classList.remove(...activeClasses);
+                    el.classList.add(...inactiveClasses);
+                }
+            });
+        }
+
+        // Initialize state (since HTML has hardcoded classes, we might want to clean them up or just let JS handle clicks. 
+        // But for initial load consistency, the HTML already has 'active' classes manually added to the first item. 
+        // We just need to make sure the JS logic matches.)
+
+        // --- Dialog Logic ---
+		window.openHonor = (id) => {
+            const item = window.HONORS_DATA.find(i => i.id === id);
+            if (!item || !dialog) return;
+
+            // Populate
+            const img = document.getElementById('dialog-img');
+            img.src = item.original;
+            
+            document.getElementById('dialog-title').textContent = item.title;
+            document.getElementById('dialog-issuer').textContent = item.issuer;
+            document.getElementById('dialog-time').textContent = item.time.display;
+            
+            // Level styling
+            const levelEl = document.getElementById('dialog-level');
+            levelEl.textContent = item.level;
+            levelEl.className = `inline-block px-2 py-0.5 rounded text-xs font-bold mb-2 border ${
+                item.level === '国家级' ? 'text-rose-600 border-rose-200 bg-rose-50' :
+                item.level === '省级' ? 'text-indigo-600 border-indigo-200 bg-indigo-50' :
+                'text-emerald-600 border-emerald-200 bg-emerald-50'
+            }`;
+
+            // Details
+            const criteriaBox = document.getElementById('dialog-criteria-box');
+            const descBox = document.getElementById('dialog-desc-box');
+            const ratioBox = document.getElementById('dialog-ratio-box');
+            const extraContainer = document.getElementById('dialog-extra');
+
+            if (item.criteria) {
+                document.getElementById('dialog-criteria').textContent = item.criteria;
+                criteriaBox.classList.remove('hidden');
+            } else {
+                criteriaBox.classList.add('hidden');
+            }
+
+            if (item.description) {
+                document.getElementById('dialog-desc').textContent = item.description;
+                descBox.classList.remove('hidden');
+            } else {
+                descBox.classList.add('hidden');
+            }
+
+            if (item.criteria || item.description) {
+                extraContainer.classList.remove('hidden');
+            } else {
+                extraContainer.classList.add('hidden');
+            }
+
+            if (item.ratio) {
+                document.getElementById('dialog-ratio').textContent = item.ratio;
+                ratioBox.classList.remove('hidden');
+            } else {
+                ratioBox.classList.add('hidden');
+            }
+
+            // Download
+            document.getElementById('dialog-download').href = item.original;
+
+			dialog.showModal();
+		};
+
+		closeBtn?.addEventListener('click', () => dialog?.close());
+		dialog?.addEventListener('click', (e) => {
+            const rect = dialog.getBoundingClientRect();
+            if (e.clientY < rect.top || e.clientY > rect.bottom || e.clientX < rect.left || e.clientX > rect.right) {
+                dialog.close();
+            }
+		});
+
+        // --- Filter Logic ---
+        function filterItems() {
+            const levelSections = document.querySelectorAll('.level-section');
+            let totalVisibleCount = 0;
+
+            levelSections.forEach(levelSection => {
+                const categorySections = levelSection.querySelectorAll('.category-section');
+                let levelHasVisibleItems = false;
+                
+                // If filter is active and this level doesn't match, hide the whole level section
+                const levelName = levelSection.dataset.level;
+                if (currentFilter !== 'all' && levelName !== currentFilter) {
+                    levelSection.classList.add('hidden');
+                    return; // Skip processing categories
+                }
+
+                categorySections.forEach(catSection => {
+                    // Check if category has any visible items across all years
+                    const yearGroups = catSection.querySelectorAll('.year-group');
+                    let catHasVisibleItems = false;
+                    
+                    yearGroups.forEach(yearGroup => {
+                        const cards = yearGroup.querySelectorAll('.honor-card');
+                        let yearHasVisibleItems = false;
+
+                        cards.forEach(card => {
+                            const searchStr = card.dataset.search;
+                            const matchSearch = !currentSearch || searchStr.includes(currentSearch);
+
+                            if (matchSearch) {
+                                card.classList.remove('hidden');
+                                yearHasVisibleItems = true;
+                                totalVisibleCount++;
+                            } else {
+                                card.classList.add('hidden');
+                            }
+                        });
+
+                        if (yearHasVisibleItems) {
+                            yearGroup.classList.remove('hidden');
+                            catHasVisibleItems = true;
+                        } else {
+                            yearGroup.classList.add('hidden');
+                        }
+                    });
+
+                    if (catHasVisibleItems) {
+                        catSection.classList.remove('hidden');
+                        levelHasVisibleItems = true;
+                    } else {
+                        catSection.classList.add('hidden');
+                    }
+                });
+
+                if (levelHasVisibleItems) {
+                    levelSection.classList.remove('hidden');
+                } else {
+                    levelSection.classList.add('hidden');
+                }
+            });
+
+            // Also handle timeline view (which is flat list)
+            // Note: Timeline view logic needs to be separate or we need to rethink structure
+            // For now, let's just apply simple filter to timeline items since they are not nested in sections in HTML
+            const timelineCards = document.querySelectorAll('#timeline-view .honor-card');
+            timelineCards.forEach(card => {
+                 const level = card.dataset.level;
+                 const searchStr = card.dataset.search;
+                 const matchFilter = currentFilter === 'all' || level === currentFilter;
+                 const matchSearch = !currentSearch || searchStr.includes(currentSearch);
+                 
+                 if (matchFilter && matchSearch) {
+                     card.classList.remove('hidden');
+                     // totalVisibleCount is already tracked by grid view loop? No, they are separate views.
+                     // But empty state depends on *any* visible item. 
+                     // Since we only show one view at a time, we should track visibility based on active view.
+                 } else {
+                     card.classList.add('hidden');
+                 }
+            });
+            
+            // Re-calculate visible count based on ACTIVE view
+            let activeVisibleCount = 0;
+            if (!gridView.classList.contains('hidden')) {
+                 // Count visible cards in grid
+                 activeVisibleCount = document.querySelectorAll('#grid-view .honor-card:not(.hidden)').length;
+            } else {
+                 activeVisibleCount = document.querySelectorAll('#timeline-view .honor-card:not(.hidden)').length;
+            }
+
+            if (activeVisibleCount === 0) {
+                emptyState.classList.remove('hidden');
+                gridView.classList.add('hidden');
+                timelineView.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                if (document.getElementById('view-grid').classList.contains('shadow-sm')) {
+                    gridView.classList.remove('hidden');
+                } else {
+                    timelineView.classList.remove('hidden');
+                }
+            }
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setActive(filterBtns, btn, activeFilterClasses, inactiveFilterClasses);
+                currentFilter = btn.dataset.filter;
+                filterItems();
+            });
+        });
+
+        searchInput?.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            filterItems();
+        });
+
+        // --- View Toggle ---
+        document.getElementById('view-grid').addEventListener('click', function() {
+            setActive(viewBtns, this, activeViewClasses, inactiveViewClasses);
+            gridView.classList.remove('hidden');
+            timelineView.classList.add('hidden');
+            filterItems(); 
+        });
+
+        document.getElementById('view-timeline').addEventListener('click', function() {
+            setActive(viewBtns, this, activeViewClasses, inactiveViewClasses);
+            gridView.classList.add('hidden');
+            timelineView.classList.remove('hidden');
+            filterItems();
+        });
+
+	</script>
+</BaseLayout>
