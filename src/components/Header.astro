@@ -1,16 +1,21 @@
 ---
-import HeaderLink from './HeaderLink.astro';
-import { SITE_TITLE } from '../consts';
+import HeaderLink from "./HeaderLink.astro";
+import { SITE_TITLE } from "../consts";
 ---
 
 <header class="glass sticky top-0 z-50 transition-all duration-300">
-	<nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+	<nav
+		class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+	>
 		<div class="flex items-center">
-			<a href="/" class="text-lg sm:text-xl font-semibold tracking-tight text-slate-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-300 transition-colors">
+			<a
+				href="/"
+				class="text-lg sm:text-xl font-semibold tracking-tight text-slate-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+			>
 				{SITE_TITLE}
 			</a>
 		</div>
-		
+
 		<div class="flex items-center gap-2">
 			<div class="hidden md:flex items-center gap-2">
 				<HeaderLink href="/">首页</HeaderLink>
@@ -26,8 +31,27 @@ import { SITE_TITLE } from '../consts';
 				class="inline-flex items-center justify-center rounded-full p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-900/5 dark:hover:bg-white/10 transition-colors"
 				aria-label="切换主题"
 			>
-				<svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-				<svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+				<svg
+					id="theme-toggle-dark-icon"
+					class="hidden w-5 h-5"
+					fill="currentColor"
+					viewBox="0 0 20 20"
+					xmlns="http://www.w3.org/2000/svg"
+					><path
+						d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+					></path></svg
+				>
+				<svg
+					id="theme-toggle-light-icon"
+					class="hidden w-5 h-5"
+					fill="currentColor"
+					viewBox="0 0 20 20"
+					xmlns="http://www.w3.org/2000/svg"
+					><path
+						d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+						fill-rule="evenodd"
+						clip-rule="evenodd"></path></svg
+				>
 			</button>
 
 			<button
@@ -38,90 +62,135 @@ import { SITE_TITLE } from '../consts';
 				aria-controls="mobile-menu"
 				aria-expanded="false"
 			>
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+				<svg
+					class="w-5 h-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4 6h16M4 12h16M4 18h16"></path>
 				</svg>
 			</button>
 		</div>
 	</nav>
-	<div id="mobile-menu" class="md:hidden hidden border-t border-slate-200/70 dark:border-slate-800/70">
-		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex flex-col gap-1">
-			<HeaderLink href="/" class="justify-start">首页</HeaderLink>
-			<HeaderLink href="/blog" class="justify-start">文章</HeaderLink>
-			<HeaderLink href="/projects" class="justify-start">项目</HeaderLink>
-			<HeaderLink href="/honors" class="justify-start">大学荣誉</HeaderLink>
-			<HeaderLink href="/about" class="justify-start">关于我</HeaderLink>
+	<div
+		id="mobile-menu"
+		class="md:hidden hidden border-t border-slate-200/70 dark:border-slate-800/70 overflow-hidden transition-all duration-300 ease-in-out origin-top"
+	>
+		<div
+			class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-2 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl"
+		>
+			<HeaderLink
+				href="/"
+				class="justify-start w-full px-4 py-3 text-base rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+				>首页</HeaderLink
+			>
+			<HeaderLink
+				href="/blog"
+				class="justify-start w-full px-4 py-3 text-base rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+				>文章</HeaderLink
+			>
+			<HeaderLink
+				href="/projects"
+				class="justify-start w-full px-4 py-3 text-base rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+				>项目</HeaderLink
+			>
+			<HeaderLink
+				href="/honors"
+				class="justify-start w-full px-4 py-3 text-base rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+				>大学荣誉</HeaderLink
+			>
+			<HeaderLink
+				href="/about"
+				class="justify-start w-full px-4 py-3 text-base rounded-xl hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+				>关于我</HeaderLink
+			>
 		</div>
 	</div>
 </header>
 
 <script>
-const themeToggleBtn = document.getElementById('theme-toggle');
-const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle');
-const mobileMenu = document.getElementById('mobile-menu');
+	const themeToggleBtn = document.getElementById("theme-toggle");
+	const themeToggleDarkIcon = document.getElementById(
+		"theme-toggle-dark-icon",
+	);
+	const themeToggleLightIcon = document.getElementById(
+		"theme-toggle-light-icon",
+	);
+	const mobileMenuToggleBtn = document.getElementById("mobile-menu-toggle");
+	const mobileMenu = document.getElementById("mobile-menu");
 
-function updateIcons() {
-    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        themeToggleLightIcon?.classList.remove('hidden');
-        themeToggleDarkIcon?.classList.add('hidden');
-    } else {
-        themeToggleLightIcon?.classList.add('hidden');
-        themeToggleDarkIcon?.classList.remove('hidden');
-    }
-}
+	function updateIcons() {
+		if (
+			localStorage.getItem("color-theme") === "dark" ||
+			(!("color-theme" in localStorage) &&
+				window.matchMedia("(prefers-color-scheme: dark)").matches)
+		) {
+			themeToggleLightIcon?.classList.remove("hidden");
+			themeToggleDarkIcon?.classList.add("hidden");
+		} else {
+			themeToggleLightIcon?.classList.add("hidden");
+			themeToggleDarkIcon?.classList.remove("hidden");
+		}
+	}
 
-updateIcons();
+	updateIcons();
 
-function toggleTheme() {
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        }
-    } else {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        }
-    }
-    updateIcons();
-}
+	function toggleTheme() {
+		if (localStorage.getItem("color-theme")) {
+			if (localStorage.getItem("color-theme") === "light") {
+				document.documentElement.classList.add("dark");
+				localStorage.setItem("color-theme", "dark");
+			} else {
+				document.documentElement.classList.remove("dark");
+				localStorage.setItem("color-theme", "light");
+			}
+		} else {
+			if (document.documentElement.classList.contains("dark")) {
+				document.documentElement.classList.remove("dark");
+				localStorage.setItem("color-theme", "light");
+			} else {
+				document.documentElement.classList.add("dark");
+				localStorage.setItem("color-theme", "dark");
+			}
+		}
+		updateIcons();
+	}
 
-themeToggleBtn?.addEventListener('click', toggleTheme);
+	themeToggleBtn?.addEventListener("click", toggleTheme);
 
-function setMobileMenuOpen(open) {
-	if (!mobileMenuToggleBtn || !mobileMenu) return;
-	mobileMenu.classList.toggle('hidden', !open);
-	mobileMenuToggleBtn.setAttribute('aria-expanded', String(open));
-}
+	function setMobileMenuOpen(open: boolean) {
+		if (!mobileMenuToggleBtn || !mobileMenu) return;
+		mobileMenu.classList.toggle("hidden", !open);
+		mobileMenuToggleBtn.setAttribute("aria-expanded", String(open));
+	}
 
-mobileMenuToggleBtn?.addEventListener('click', () => {
-	const isOpen = mobileMenu && !mobileMenu.classList.contains('hidden');
-	setMobileMenuOpen(!isOpen);
-});
+	mobileMenuToggleBtn?.addEventListener("click", () => {
+		const isOpen = mobileMenu && !mobileMenu.classList.contains("hidden");
+		setMobileMenuOpen(!isOpen);
+	});
 
-document.addEventListener('keydown', (e) => {
-	if (e.key === 'Escape') setMobileMenuOpen(false);
-});
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") setMobileMenuOpen(false);
+	});
 
-document.addEventListener('click', (e) => {
-	if (!mobileMenu || !mobileMenuToggleBtn) return;
-	const target = e.target;
-	if (!(target instanceof Node)) return;
-	if (mobileMenu.classList.contains('hidden')) return;
-	if (mobileMenu.contains(target) || mobileMenuToggleBtn.contains(target)) return;
-	setMobileMenuOpen(false);
-});
+	document.addEventListener("click", (e) => {
+		if (!mobileMenu || !mobileMenuToggleBtn) return;
+		const target = e.target;
+		if (!(target instanceof Node)) return;
+		if (mobileMenu.classList.contains("hidden")) return;
+		if (mobileMenu.contains(target) || mobileMenuToggleBtn.contains(target))
+			return;
+		setMobileMenuOpen(false);
+	});
 
-window.addEventListener('resize', () => {
-	if (window.matchMedia('(min-width: 768px)').matches) setMobileMenuOpen(false);
-});
+	window.addEventListener("resize", () => {
+		if (window.matchMedia("(min-width: 768px)").matches)
+			setMobileMenuOpen(false);
+	});
 </script>

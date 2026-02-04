@@ -1,14 +1,33 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_TITLE } from '../consts';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE } from "../consts";
 
 const skills = [
     { category: "编程语言", items: ["Java (熟练)", "JavaScript", "HTML/CSS"] },
-    { category: "后端框架", items: ["Spring Boot", "MyBatis-Plus", "PHP Web开发"] },
-    { category: "前端技术", items: ["Vue.js", "Element-UI", "Uni-App", "Tailwind CSS"] },
-    { category: "数据库", items: ["MySQL (精通表结构设计、SQL编写与索引优化)"] },
-    { category: "开发与部署", items: ["Docker", "Git", "Maven", "IntelliJ IDEA", "VS Code"] },
-    { category: "软技能", items: ["良好的团队协作与沟通能力", "快速理解业务需求", "出色的自主学习和问题解决能力"] },
+    {
+        category: "后端框架",
+        items: ["Spring Boot", "MyBatis-Plus", "PHP Web开发"],
+    },
+    {
+        category: "前端技术",
+        items: ["Vue.js", "Element-UI", "Uni-App", "Tailwind CSS"],
+    },
+    {
+        category: "数据库",
+        items: ["MySQL (精通表结构设计、SQL编写与索引优化)"],
+    },
+    {
+        category: "开发与部署",
+        items: ["Docker", "Git", "Maven", "IntelliJ IDEA", "VS Code"],
+    },
+    {
+        category: "软技能",
+        items: [
+            "良好的团队协作与沟通能力",
+            "快速理解业务需求",
+            "出色的自主学习和问题解决能力",
+        ],
+    },
 ];
 
 const education = [
@@ -16,8 +35,8 @@ const education = [
         school: "广西财经学院",
         degree: "计算机科学与技术 (本科)",
         period: "2024-09 ~ 2026-06",
-        achievements: "综合成绩在专业排名前三 (127/3)"
-    }
+        achievements: "综合成绩在专业排名前三 (127/3)",
+    },
 ];
 
 const experiences = [
@@ -29,8 +48,8 @@ const experiences = [
         description: [
             "后端设计与开发：独立设计并实现用户认证、资源查询与收藏管理等核心RESTful API接口。",
             "数据库与性能优化：设计6张核心表结构，通过分析慢SQL，为收藏表建立(user_id, resource_id)联合索引，将查询耗时从200ms优化至50ms以内。",
-            "前端开发与实现：使用Uni-App框架开发移动端首页、详情页及交互功能，并搭配Vue+Element-UI完成配套管理后台的开发。"
-        ]
+            "前端开发与实现：使用Uni-App框架开发移动端首页、详情页及交互功能，并搭配Vue+Element-UI完成配套管理后台的开发。",
+        ],
     },
     {
         company: "农场生鲜商品电商管理信息系统-优鲜选",
@@ -40,8 +59,8 @@ const experiences = [
         description: [
             "后端架构与开发：参与后端架构搭建，负责用户注册（BCrypt加密）、商品分页查询、订单状态流转等核心模块的API开发与调试。",
             "前端工程实践：使用Vue.js与Element-UI开发商品管理模块，通过组件化与数据加载优化，使列表页面加载速度提升40%。",
-            "部署与效率提升：使用Docker容器化部署应用与环境，编写自动化部署脚本，将本地环境搭建时间从30分钟缩短至5分钟，极大提升团队开发效率。"
-        ]
+            "部署与效率提升：使用Docker容器化部署应用与环境，编写自动化部署脚本，将本地环境搭建时间从30分钟缩短至5分钟，极大提升团队开发效率。",
+        ],
     },
     {
         company: "荣誉证书",
@@ -53,122 +72,208 @@ const experiences = [
             "广西壮族自治区普通高等教育优秀毕业生 (2024)",
             "校级优秀学生干部 & 校级奖学金 (2022, 2023)",
             "校级英语口语竞赛二等奖 (2022)",
-            "其他奖项 (2022年大学生朋辈心理辅导三等奖，2022年先进工作者，2022年优秀优秀青年志愿者等)"
-        ]
-    }
-
+            "其他奖项 (2022年大学生朋辈心理辅导三等奖，2022年先进工作者，2022年优秀优秀青年志愿者等)",
+        ],
+    },
 ];
 ---
 
 <BaseLayout title={`关于我 - ${SITE_TITLE}`} description="关于林景彪">
-	<div class="space-y-12 max-w-4xl mx-auto">
+    <div class="space-y-12 max-w-4xl mx-auto">
         <div class="flex justify-end print:hidden">
-            <button onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 rounded-full text-sm font-medium transition-colors">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            <button
+                onclick="window.print()"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 rounded-full text-sm font-medium transition-colors"
+            >
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                    ></path>
                 </svg>
                 打印简历
             </button>
         </div>
 
-        <section class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-6 sm:p-8 shadow-sm print:shadow-none print:border-none print:p-0">
+        <section
+            class="rounded-3xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-5 md:p-8 shadow-sm print:shadow-none print:border-none print:p-0"
+        >
             <div class="text-left">
-                <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">林景彪</h1>
-                <p class="text-base sm:text-lg text-primary-700 dark:text-primary-300 font-medium mb-5">全栈开发者 · 计算机科学与技术</p>
-                <div class="flex flex-wrap gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <span class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10">年龄：23 岁</span>
-                    <a class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors" href="tel:18477285872">电话：18477285872</a>
-                    <a class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors" href="mailto:3091180018@qq.com">邮箱：3091180018@qq.com</a>
-                    <a class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors" href="https://github.com/ljb999" target="_blank" rel="noreferrer">GitHub：ljb999</a>
+                <h1
+                    class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2"
+                >
+                    林景彪
+                </h1>
+                <p
+                    class="text-base sm:text-lg text-primary-700 dark:text-primary-300 font-medium mb-5"
+                >
+                    全栈开发者 · 计算机科学与技术
+                </p>
+                <div
+                    class="flex flex-wrap gap-2 text-sm text-slate-600 dark:text-slate-300"
+                >
+                    <span
+                        class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10"
+                        >年龄：23 岁</span
+                    >
+                    <a
+                        class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors"
+                        href="tel:18477285872">电话：18477285872</a
+                    >
+                    <a
+                        class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors"
+                        href="mailto:3091180018@qq.com"
+                        >邮箱：3091180018@qq.com</a
+                    >
+                    <a
+                        class="inline-flex items-center rounded-full px-3 py-1 bg-slate-900/5 dark:bg-white/10 hover:bg-slate-900/10 dark:hover:bg-white/15 transition-colors"
+                        href="https://github.com/ljb999"
+                        target="_blank"
+                        rel="noreferrer">GitHub：ljb999</a
+                    >
                 </div>
             </div>
         </section>
 
         <!-- Education -->
         <section>
-            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center">
+            <h2
+                class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center"
+            >
                 <span class="w-1.5 h-7 bg-primary-600 rounded-full mr-3"></span>
                 教育背景
             </h2>
-            <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 shadow-sm p-6 sm:p-7">
-                {education.map(edu => (
-                    <div>
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                             <h3 class="text-xl font-bold text-slate-900 dark:text-white">{edu.school}</h3>
-                             <span class="text-sm font-mono text-slate-500 dark:text-slate-400">{edu.period}</span>
+            <div
+                class="rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 shadow-sm p-6 sm:p-7"
+            >
+                {
+                    education.map((edu) => (
+                        <div>
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+                                    {edu.school}
+                                </h3>
+                                <span class="text-sm font-mono text-slate-500 dark:text-slate-400">
+                                    {edu.period}
+                                </span>
+                            </div>
+                            <p class="text-slate-900 dark:text-white font-medium">
+                                {edu.degree}
+                            </p>
+                            <p class="text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                <span class="font-bold">专业成绩：</span>
+                                {edu.achievements}
+                            </p>
+                            <p class="text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                                <span class="font-bold">核心课程：</span>
+                                开发基础 (Java/C, 数据结构, OS, PHP, 网络原理);
+                                后端技术 (Spring Boot, 数据库, MyBatis-Plus);
+                                前端技术 (Vue.js, JS, Uni-App); 工程实践
+                                (软件开发岗前训练, 实施与运维).
+                            </p>
                         </div>
-                        <p class="text-slate-900 dark:text-white font-medium">{edu.degree}</p>
-                        <p class="text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
-                            <span class="font-bold">专业成绩：</span>{edu.achievements}
-                        </p>
-                        <p class="text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
-                            <span class="font-bold">核心课程：</span>开发基础 (Java/C, 数据结构, OS, PHP, 网络原理); 后端技术 (Spring Boot, 数据库, MyBatis-Plus); 前端技术 (Vue.js, JS, Uni-App); 工程实践 (软件开发岗前训练, 实施与运维).
-                        </p>
-                    </div>
-                ))}
+                    ))
+                }
             </div>
         </section>
 
         <!-- Experience -->
         <section>
-             <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center">
+            <h2
+                class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center"
+            >
                 <span class="w-1.5 h-7 bg-primary-600 rounded-full mr-3"></span>
                 项目经历
             </h2>
             <div class="space-y-8">
-                {experiences.map(exp => (
-                    <div class="relative pl-8 border-l-2 border-slate-200 dark:border-slate-800">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 bg-primary-500 rounded-full border-4 border-slate-50 dark:border-slate-950"></div>
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                {exp.company}
-                                {exp.link && (
-                                    <a href={exp.link} class="text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors print:hidden" title="查看项目详情">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                    </a>
-                                )}
-                            </h3>
-                            <span class="text-sm font-mono text-slate-500 dark:text-slate-400">{exp.period}</span>
+                {
+                    experiences.map((exp) => (
+                        <div class="relative pl-8 border-l-2 border-slate-200 dark:border-slate-800">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-primary-500 rounded-full border-4 border-slate-50 dark:border-slate-950" />
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-2">
+                                <h3 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    {exp.company}
+                                    {exp.link && (
+                                        <a
+                                            href={exp.link}
+                                            class="text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors print:hidden"
+                                            title="查看项目详情"
+                                        >
+                                            <svg
+                                                class="w-5 h-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                                />
+                                            </svg>
+                                        </a>
+                                    )}
+                                </h3>
+                                <span class="text-sm font-mono text-slate-500 dark:text-slate-400">
+                                    {exp.period}
+                                </span>
+                            </div>
+                            {exp.style !== "simple" && (
+                                <p class="text-primary-700 dark:text-primary-300 font-medium mb-3">
+                                    {exp.role}
+                                </p>
+                            )}
+
+                            <ul class="space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
+                                {exp.description.map((desc) => (
+                                    <li class="flex items-start">
+                                        <span class="mr-2 mt-1.5 w-1.5 h-1.5 bg-slate-400 rounded-full flex-shrink-0" />
+                                        <span>{desc}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                        {exp.style !== 'simple' && <p class="text-primary-700 dark:text-primary-300 font-medium mb-3">{exp.role}</p>}
-                        
-                        <ul class="space-y-2 text-slate-600 dark:text-slate-300 leading-relaxed">
-                            {exp.description.map(desc => (
-                                <li class="flex items-start">
-                                    <span class="mr-2 mt-1.5 w-1.5 h-1.5 bg-slate-400 rounded-full flex-shrink-0"></span>
-                                    <span>{desc}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+                    ))
+                }
             </div>
         </section>
 
         <!-- Skills -->
         <section>
-             <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center">
+            <h2
+                class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 flex items-center"
+            >
                 <span class="w-1.5 h-7 bg-primary-600 rounded-full mr-3"></span>
                 技能特长
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {skills.map(skill => (
-                    <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-5 hover:shadow-md transition-shadow">
-                        <h3 class="font-semibold text-slate-900 dark:text-white mb-2">{skill.category}</h3>
-                        <div class="flex flex-wrap gap-2">
-                            {skill.items.map(item => (
-                                <span class="bg-slate-900/5 dark:bg-white/10 text-slate-700 dark:text-slate-200 px-3 py-1 rounded-full text-sm border border-slate-200/50 dark:border-slate-700/50">
-                                    {item}
-                                </span>
-                            ))}
+                {
+                    skills.map((skill) => (
+                        <div class="rounded-2xl border border-slate-200/70 dark:border-slate-800/70 bg-white/70 dark:bg-slate-950/40 p-5 hover:shadow-md transition-shadow">
+                            <h3 class="font-semibold text-slate-900 dark:text-white mb-2">
+                                {skill.category}
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                {skill.items.map((item) => (
+                                    <span class="bg-slate-900/5 dark:bg-white/10 text-slate-700 dark:text-slate-200 px-3 py-1 rounded-full text-sm border border-slate-200/50 dark:border-slate-700/50">
+                                        {item}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                }
             </div>
         </section>
-        
+
         <div class="pt-8 text-center text-slate-500 italic text-sm">
             工作积极细心、踏实负责，熟练运用办公自动化软件，善于发现并解决问题，具备较强分析力与动手能力。
         </div>
