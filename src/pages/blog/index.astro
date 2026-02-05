@@ -7,6 +7,20 @@ import Card from "../../components/Card.astro";
 const posts = (await getCollection("blog")).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+const groupedPosts = posts.reduce(
+    (acc, post) => {
+        const year = post.data.pubDate.getFullYear();
+        if (!acc[year]) acc[year] = [];
+        acc[year].push(post);
+        return acc;
+    },
+    {} as Record<string, typeof posts>,
+);
+
+const sortedYears = Object.keys(groupedPosts).sort(
+    (a, b) => Number(b) - Number(a),
+);
 ---
 
 <BaseLayout title={`文章列表 - ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -21,7 +35,42 @@ const posts = (await getCollection("blog")).sort(
         </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-        {posts.map((post) => <Card post={post} />)}
+    <div class="space-y-16">
+        {
+            sortedYears.map((year) => (
+                <section>
+                    <div class="flex items-center gap-4 mb-8">
+                        <span class="w-2 h-8 rounded-full bg-indigo-500" />
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                            {year}
+                        </h2>
+                        <span class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-500 dark:text-slate-400">
+                            {groupedPosts[year].length} 篇
+                        </span>
+                    </div>
+
+                    {year.toString() === "2026" && (
+                        <div class="mb-10 pl-6 border-l-2 border-slate-100 dark:border-slate-800/50 ml-1">
+                            <div class="flex items-start gap-3">
+                                <span class="mt-2 w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500 shrink-0" />
+                                <div>
+                                    <h3 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 leading-snug">
+                                        GitHub从学生认证到部署上线的四个阶段所踩过的坑和收获
+                                    </h3>
+                                    <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">
+                                        2月1日 - 2月5日
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        {groupedPosts[year].map((post) => (
+                            <Card post={post} />
+                        ))}
+                    </div>
+                </section>
+            ))
+        }
     </div>
 </BaseLayout>
